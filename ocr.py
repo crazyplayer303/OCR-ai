@@ -1,7 +1,34 @@
+import os
 import sys
 from PIL import Image
 import pytesseract
 from transformers import BlipProcessor, BlipForConditionalGeneration
+import openai
+
+
+def ask_llm(prompt: str) -> str | None:
+    """Send a prompt to an LLM and return the response text.
+
+    The function expects an OpenAI API key in the OPENAI_API_KEY environment
+    variable. If the key is not set or the request fails, ``None`` is returned.
+    """
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        return None
+
+    openai.api_key = api_key
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return response.choices[0].message["content"].strip()
+    except Exception:
+        return None
+    llm_answer = ask_llm(text_output)
+    if llm_answer:
+        print("\nLLM response:\n" + llm_answer)
+
 import torch
 
 def main():
